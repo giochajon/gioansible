@@ -1,0 +1,18 @@
+---
+- name: "add universal/restricted repository"
+  apt_repository:
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} main universe restricted multiverse"
+    state: present
+
+- name: "install needed packages"
+  apt: 
+    name: ['git', 'dialog', 'unzip', 'xmlstarlet'] 
+    update_cache: yes
+    state: present 
+
+- name: "clone the RetroPie repo"
+  git:
+    repo: https://github.com/RetroPie/RetroPie-Setup.git
+    depth: 1 
+    dest: "{{ home_folder }}/RetroPie-Setup"
+

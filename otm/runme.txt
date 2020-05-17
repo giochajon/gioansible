@@ -1,5 +1,14 @@
 
 
+now not necesary to specify become password
+
+ansible-playbook gameconsole.yml --check
+
+to edit the hosts: ansible-vault edit hosts
+to edit the vault: ansible-vault edit group_vars/all/vault
+
+----
+
 ansible-playbook mediaserver.yml --ask-become-pass --limit clonstairs --tags livepatch --check
 
 
