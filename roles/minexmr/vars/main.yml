@@ -1,0 +1,2 @@
+---
+mine_address: "{{ xmr_key }}.{{ ansible_hostname }}"

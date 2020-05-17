@@ -1,0 +1,15 @@
+sudo apt-get install git build-essential cmake libuv1-dev libssl-dev libhwloc-dev
+
+ git clone https://github.com/xmrig/xmrig.git
+
+cd xmrig && mkdir build && cd build
+
+cmake ..
+
+make
+
+
+setsid /home/giovas/xmrig/build/xmrig -o ca.minexmr.com:4444 -u 49Yj8rCSpvUWADijKUWpQyMYKQ66bqx2ZTWRE95P3zKWTGkzS5xyGkWb5AJ3eZdMM68TqoShCfd5QMfZkM4LHdk91hA6yHj.bajotv >>~/xmrigstat.txt
+
+
+sudo vim /etc/rc.local

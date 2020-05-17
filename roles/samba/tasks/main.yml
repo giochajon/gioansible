@@ -1,0 +1,38 @@
+---
+- name: "make sure target media directory exists"
+  file:
+    path: "{{ media_dir }}"
+    state: directory
+    owner: giovas
+    group: giovas
+    mode: '0777'
+
+- name: "install needed packages"
+  apt:
+    update_cache: yes
+    name: samba
+    state: present
+
+- name: "Template samba configuration file"
+  template:
+    src: samba-settings.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: "Start samba service to change config"
+  service:
+    name: smbd
+    state: restarted
+
+- name: "enable ports on firewall"
+  ufw:
+    rule: allow
+    name: samba
+
+- name: set Samba passwords for each user
+  shell: "printf '{{ item.passwd }}\n{{ item.passwd }}\n' | smbpasswd -a {{ item.name }}"
+  with_items:
+    - "{{ users }}"
+  tags: smbpasswd

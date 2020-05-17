@@ -1,0 +1,40 @@
+---
+- name: "make sure target media directory exists"
+  file:
+    path: "{{ media_dir }}"
+    state: directory
+    owner: giovas
+    group: giovas
+    mode: '0777'
+
+- name: "make sure target media incomplete directory exists"
+  file:
+    path: "{{ media_dir }}/incomplete"
+    state: directory
+    owner: giovas
+    group: giovas
+    mode: '0777'
+
+- name: "install needed packages"
+  apt:
+    update_cache: yes
+    name: ['transmission-cli', 'transmission-common', 'transmission-daemon']
+    state: present
+
+- name: "Stop transmission daemon to change config"
+  service:
+    name: transmission-daemon
+    state: stopped
+
+- name: "Template transmission configuration file"
+  template:
+    src: transmission-settings.j2
+    dest: /var/lib/transmission-daemon/info/settings.json
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: "Start transmission daemon to change config"
+  service:
+    name: transmission-daemon
+    state: started

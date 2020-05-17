@@ -1,0 +1,41 @@
+---
+- name: "install needed packages"
+  apt:
+    update_cache: yes
+    name: ['git', 'build-essential', 'cmake', 'libuv1-dev', 'libssl-dev', 'libhwloc-dev' ]
+    state: present
+
+- name : "clone mining tool from repo"
+  git:
+    repo: https://github.com/xmrig/xmrig.git
+    dest: '{{ home_folder }}/xmrig'
+
+- name: "make sure build directory exists"
+  file:
+    path: "{{ home_folder }}/xmrig/build"
+    state: directory
+    owner: giovas
+    group: giovas
+    mode: '0777'
+
+- name: "run the cmake"
+  shell:
+    cmd: "cmake .."
+    chdir: "{{ home_folder }}/xmrig/build"
+
+- name: "Build 'all' target with a custom Makefile"
+  make:
+    chdir: "{{ home_folder }}/xmrig/build"
+    target: all
+
+- name: "Template startup for mining"
+  template:
+    src: mining-startup.j2
+    dest: /etc/init.d/minexmr
+    owner: root
+    group: root
+    mode: '0777'
+
+# - name: "enable at startup"
+#   shell:
+#     cmd: "update-rc.d minexmr defaults && update-rc.d minexmr enable"

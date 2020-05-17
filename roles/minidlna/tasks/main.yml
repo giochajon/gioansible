@@ -1,0 +1,52 @@
+---
+- name: "install needed packages"
+  apt:
+    update_cache: yes
+    name: minidlna
+    state: present
+
+- name: "Stop minidlna to change config"
+  service:
+    name: minidlna
+    state: stopped
+
+- name: "Template minidlna configuration file"
+  template:
+    src: minidlna-settings.j2
+    dest: /etc/minidlna.conf
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: Allow all access to tcp port 8200
+  ufw:
+    rule: allow
+    port: '8200'
+    proto: tcp
+
+- name: Allow all access to udp port 1900
+  ufw:
+    rule: allow
+    port: '1900'
+    proto: udp
+
+- name: Enable service minidlna
+  service:
+    name: minidlna
+    enabled: yes
+
+- name: "Start minidlna daemon to change config"
+  service:
+    name: minidlna
+    state: started
+
+- name: "create startup shortcut" 
+  template:
+    src: minidlna-settings.j2
+    dest: "{{ home_folder }}/.config/autostart/minidlna.desktop"
+    owner: root
+    group: root
+    mode: '0777'
+
+
+

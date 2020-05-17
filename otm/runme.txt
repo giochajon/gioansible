@@ -1,0 +1,33 @@
+
+
+con nuevo inventoario (-i no es necesario)
+ansible-playbook testme.yml --ask-become-pass --limit clonstairs  --check
+
+o 
+
+ansible-playbook mediaserver.yml --ask-become-pass --limit clonstairs --tags minidlna --check
+
+
+
+
+----
+
+remote
+ansible-playbook -i hosts removeCrap.yml --ask-become-pass 
+
+local
+ansible-playbook --connection=local --inventory 127.0.0.1 removeCrap.yml --ask-become-pass --check
+
+
+
+ansible-playbook -i hosts removeCrap.yml --ask-become-pass --limit clonstairs --skip-tags focal
+
+
+mediaserver
+ansible-playbook -i hosts mediaserver.yml --ask-become-pass --limit clonstairs --check
+
+just samba 
+ansible-playbook -i hosts mediaserver.yml --ask-become-pass --limit clonstairs --tags samba --check -diff
+
+just dlna
+ansible-playbook -i hosts mediaserver.yml --ask-become-pass --limit clonstairs --tags minidlna --check --diff

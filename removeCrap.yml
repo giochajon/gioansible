@@ -1,0 +1,39 @@
+---
+- hosts: all #ansible_connection=local ansible_python_interpreter=python
+  #connection: local
+  become: yes
+  #gather_facts: False
+  vars:
+    rds_aws_region: 'us-east-1'
+    aws_access_key: 'miau'
+    aws_secret_key: 'guau'
+  
+  
+  tasks:
+    - name: "install gio prerequisites"
+      apt:
+        update_cache: yes
+        name: ['vim','htop','vlc']
+        state: present
+
+    - name: "remove bloatware packages general"
+      apt:
+        name: ['libreoffic*', 'k3b*','transmissio*' ]
+        state: absent
+      register: removal_result
+      ignore_errors: True
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'bionic'
+      
+
+    - name: "remove bloatware packages focal"
+      apt:
+        name: ['troji*','transmissio*','quass*', '2048*','cups*','noble*','skan*' ]
+        state: absent
+      register: removal_result
+      ignore_errors: True
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'focal'
+      tags: focal
+    
+    - debug:
+        var: removal_result
+    

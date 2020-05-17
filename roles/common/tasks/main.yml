@@ -1,0 +1,8 @@
+---
+- name: "make sure package directory exists"
+  file:
+    path: "{{ media_dir }}"
+    state: directory
+    owner: giovas
+    group: giovas
+    mode: '0777'
