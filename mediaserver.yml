@@ -12,3 +12,5 @@
       tags: transmission
     - role: minexmr
       tags: minexmr
+    - role: livepatch
+      tags: livepatch

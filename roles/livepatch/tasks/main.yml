@@ -1,0 +1,41 @@
+---
+- name: "install needed packages"
+  apt:
+    update_cache: yes
+    name: snapd
+    state: present
+
+- name: "Install canonical livepatch for ubuntu"
+  block:
+    - name: "Install livepach package"
+      snap:
+        name: canonical-livepatch
+        state: present
+
+    - name: "Verify that express vpn is not active"
+      command: "expressvpn status"
+      register: expressvpn_initial_status
+      changed_when: expressvpn_initial_status.rc
+      ignore_errors: true 
+      check_mode: no  
+
+    - name: "test variable"
+      debug: 
+        msg: " la llave es: {{ expressvpn_initial_status }}"
+      check_mode: no  
+
+    - name: "disconnect express vpn if connected"
+      shell: 
+        cmd: "expressvpn disconnect"
+      when:  expressvpn_initial_status is search("Connected")
+  
+    - name: "configure the canonical key"
+      shell:
+        cmd: "canonical-livepatch enable {{ canonical_key }}"
+    
+    - name: "connect express vpn "
+      shell: 
+        cmd: "expressvpn connect smart"
+      when:  expressvpn_initial_status is search("Connected")
+
+  when: ansible_distribution == 'Ubuntu'

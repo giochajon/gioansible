@@ -1,6 +1,9 @@
 
 
-con nuevo inventoario (-i no es necesario)
+ansible-playbook mediaserver.yml --ask-become-pass --limit clonstairs --tags livepatch --check
+
+
+con nuevo inventario (-i no es necesario)
 ansible-playbook testme.yml --ask-become-pass --limit clonstairs  --check
 
 o 
