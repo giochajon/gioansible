@@ -16,3 +16,32 @@
     depth: 1 
     dest: "{{ home_folder }}/RetroPie-Setup"
 
+- name: "install retropie core packages NES, SNES, atari 2600 and sega genesis"
+  shell:
+    cmd: "sudo __nodialog=1 {{ home_folder }}/RetroPie-Setup/retropie_packages.sh {{ item }}"
+    chdir: "{{ home_folder }}/RetroPie-Setup"
+  with_items: 
+    - setup basic_install
+    - lr-fceumm 
+    - lr-snes9x2005
+    - lr-stella2014
+    - lr-genesis-plus-gx
+
+- name: "install NES roms"
+  block:
+    # - name: "Download file with NES roms from dropbox"
+    #   get_url:
+    #     url: "{{ dropbox_nes_roms }}"
+    #     dest: "{{ home_folder }}/RetroPie/roms/nes/nesrom.zip"
+    - name: "Download file with NES roms from dropbox"
+      shell:
+        cmd: "curl -L {{ dropbox_nes_roms }} > nesroms.zip"
+        chdir: "{{ home_folder }}/RetroPie/roms/nes/"
+        warn: false
+
+    - name: "uncompress the rom zip file"
+      shell:
+        cmd: "unzip {{ home_folder }}/RetroPie/roms/nes/nesroms.zip"
+        chdir: "{{ home_folder }}/RetroPie/roms/nes/"
+         
+  tags: nesroms
