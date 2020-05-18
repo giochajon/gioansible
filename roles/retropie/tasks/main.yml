@@ -29,10 +29,14 @@
 
 - name: "install NES roms"
   block:
-    # - name: "Download file with NES roms from dropbox"
-    #   get_url:
-    #     url: "{{ dropbox_nes_roms }}"
-    #     dest: "{{ home_folder }}/RetroPie/roms/nes/nesrom.zip"
+    - name: "make sure rome target directory exists"
+      file:
+        path: "{{ home_folder }}/RetroPie/roms/nes/"
+        state: directory
+        owner: giovas
+        group: giovas
+        mode: '0777'
+
     - name: "Download file with NES roms from dropbox"
       shell:
         cmd: "curl -L {{ dropbox_nes_roms }} > nesroms.zip"
@@ -41,7 +45,12 @@
 
     - name: "uncompress the rom zip file"
       shell:
-        cmd: "unzip {{ home_folder }}/RetroPie/roms/nes/nesroms.zip"
+        cmd: "unzip -o {{ home_folder }}/RetroPie/roms/nes/nesroms.zip -x /"
         chdir: "{{ home_folder }}/RetroPie/roms/nes/"
-         
+        warn: false
+
+    - name: "Clean up zipfile"
+      file:
+        state: absent
+        path: "{{ home_folder }}/RetroPie/roms/nes/nesroms.zip"         
   tags: nesroms
