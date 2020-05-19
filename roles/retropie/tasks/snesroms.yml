@@ -22,4 +22,4 @@
 - name: "Clean up zipfile"
   file:
     state: absent
-    path: "{{ home_folder }}/RetroPie/roms/snes/snesroms.zip"  
+    path: "{{ home_folder }}/RetroPie/roms/snes/snesroms.zip"

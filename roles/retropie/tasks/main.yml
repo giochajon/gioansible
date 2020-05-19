@@ -5,15 +5,15 @@
     state: present
 
 - name: "install needed packages"
-  apt: 
-    name: ['git', 'dialog', 'unzip', 'xmlstarlet'] 
+  apt:
+    name: ['git', 'dialog', 'unzip', 'xmlstarlet']
     update_cache: yes
-    state: present 
+    state: present
 
 - name: "clone the RetroPie repo"
   git:
     repo: https://github.com/RetroPie/RetroPie-Setup.git
-    depth: 1 
+    depth: 1
     dest: "{{ home_folder }}/RetroPie-Setup"
 
 - name: "install retropie core packages NES, SNES, atari 2600 and sega genesis"
@@ -24,16 +24,39 @@
     - 141
     - 812
     - setup basic_install
-    - lr-fceumm 
+    - lr-fceumm
     - lr-snes9x2005
     - lr-stella2014
     - lr-genesis-plus-gx
 
 - name: "install NES roms"
-  include: nesroms.yml        
+  include: nesroms.yml
   tags: nesroms
 
 - name: "install SNES roms"
   include: snesroms.yml
   tags: snesroms
 
+# - name: "debug by list"
+#   import_tasks: msg.yml
+#   vars:
+#     messages:
+#         - 1
+#         - 2
+#   tags: addroms
+
+- name: "install roms by list"
+  import_tasks: addroms.yml
+  vars: 
+    romtype:
+      - "{{ sega }}"
+      - "{{ atari }}"
+  tags: addroms
+
+# - name: "install roms by list"
+#   include_tasks:
+#     file: addroms.yml
+#   with items:
+#     - sega
+#     - atari
+#   tags: addroms

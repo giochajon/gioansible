@@ -6,7 +6,7 @@
     owner: giovas
     group: giovas
     mode: '0777'
-
+  
 - name: "Download file with NES roms from dropbox"
   shell:
     cmd: "curl -L {{ dropbox_nes_roms }} > nesroms.zip"
@@ -22,4 +22,4 @@
 - name: "Clean up zipfile"
   file:
     state: absent
-    path: "{{ home_folder }}/RetroPie/roms/nes/nesroms.zip"  
+    path: "{{ home_folder }}/RetroPie/roms/nes/nesroms.zip"

@@ -1,0 +1,35 @@
+---
+- name: "make sure rome target directory exists"
+  file:
+        path: "{{ item.target }}"
+        state: directory
+        owner: giovas
+        group: giovas
+        mode: '0777'
+  with_items:
+    - "{{ romtype }}"
+
+- name: "Download file with NES roms from dropbox"
+  shell:
+        cmd: "curl -L {{ item.dropbox }} > {{ item.zipname }}"
+        chdir: "{{ item.target }}"
+        warn: false
+  with_items:
+    - "{{ romtype }}"
+
+
+- name: "uncompress the rom zip file"
+  shell:
+        cmd: "unzip -o {{ item.target }}/{{ item.zipname }} -x /"
+        chdir: "{{ item.target }}"
+        warn: false
+  with_items:
+    - "{{ romtype }}"
+
+
+- name: "Clean up zipfile"
+  file:
+        state: absent
+        path: "{{ item.target }}/{{ item.zipname }}"
+  with_items:
+    - "{{ romtype }}"

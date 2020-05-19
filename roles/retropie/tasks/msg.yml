@@ -1,0 +1,13 @@
+---
+
+- name: Message 1
+  debug:
+    msg: "Message 1: {{ item }}"
+  with_items:
+    - "{{ messages }}"
+
+- name: Message 2
+  debug:
+    msg: "Message 2: {{ item }}"
+  with_items:
+    - "{{ messages }}"
