@@ -1,0 +1,25 @@
+---
+- name: "make sure rome target directory exists"
+  file:
+    path: "{{ home_folder }}/RetroPie/roms/nes/"
+    state: directory
+    owner: giovas
+    group: giovas
+    mode: '0777'
+
+- name: "Download file with NES roms from dropbox"
+  shell:
+    cmd: "curl -L {{ dropbox_nes_roms }} > nesroms.zip"
+    chdir: "{{ home_folder }}/RetroPie/roms/nes/"
+    warn: false
+
+- name: "uncompress the rom zip file"
+  shell:
+    cmd: "unzip -o {{ home_folder }}/RetroPie/roms/nes/nesroms.zip -x /"
+    chdir: "{{ home_folder }}/RetroPie/roms/nes/"
+    warn: false
+
+- name: "Clean up zipfile"
+  file:
+    state: absent
+    path: "{{ home_folder }}/RetroPie/roms/nes/nesroms.zip"  

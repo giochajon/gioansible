@@ -1,0 +1,25 @@
+---
+- name: "make sure rom target directory exists"
+  file:
+    path: "{{ home_folder }}/RetroPie/roms/snes/"
+    state: directory
+    owner: giovas
+    group: giovas
+    mode: '0777'
+
+- name: "Download file with SNES roms from dropbox"
+  shell:
+    cmd: "curl -L {{ dropbox_snes_roms }} > snesroms.zip"
+    chdir: "{{ home_folder }}/RetroPie/roms/snes/"
+    warn: false
+
+- name: "uncompress the rom zip file"
+  shell:
+    cmd: "unzip -o {{ home_folder }}/RetroPie/roms/snes/snesroms.zip -x /"
+    chdir: "{{ home_folder }}/RetroPie/roms/snes/"
+    warn: false
+
+- name: "Clean up zipfile"
+  file:
+    state: absent
+    path: "{{ home_folder }}/RetroPie/roms/snes/snesroms.zip"  
