@@ -1,0 +1,110 @@
+---
+# Installs docker-ce and optionally adds a user to the docker group
+#
+# Vars:
+#   docker_user {optional}: Name of linux user which will stop and
+#                           start docker containers
+
+- name: "install Docker CE prerequisites"
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - linux-image-extra-virtual
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: "install Docker CE prerequisites - trusty"
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - linux-image-extra-{{ansible_kernel}}
+  when: ansible_distribution_version is version('14.04', '=')
+
+# Install Docker apt for >=14.04
+- block:
+
+  # Can't use apt_key because downloading from docker.com requires SNI
+  # which requires python >= 2.7.9
+  - shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_lsb.codename}} stable
+      state: present
+  - apt:
+    # Locked docker to a version as this has caused problems in the past when allowed to update
+    # to most recent version. Examples being two occasions where docker networking broke selenium tests
+      pkg: docker-ce=5:18.09.8*
+      state: present
+    ignore_errors: "{{ ansible_check_mode }}"
+
+  # This repo is not available for anything older than 14.04
+  when: ansible_distribution_version is version('14.04', '>=')
+
+# Install docker-engine for 12.04
+# Taken from https://runnable.com/docker/install-docker-on-linux
+- block:
+
+    - apt_key:
+        keyserver: "hkp://p80.pool.sks-keyservers.net:80"
+        id: "58118E89F3A912897C070ADBF76221572C52609D"
+    - apt_repository:
+        repo: deb https://apt.dockerproject.org/repo ubuntu-precise main
+        state: present
+    - apt:
+        pkg: docker-engine
+        state: present
+
+  when: ansible_distribution_version is version('12.04', '=')
+
+- name: "check docker-compose installed"
+  stat:
+    path: /usr/local/bin/docker-compose
+  register: docker_compose_installed
+
+- name: "install docker-compose if not installed"
+  shell: curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
+  when: not docker_compose_installed.stat.exists
+
+- name: "add docker_users to docker group"
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  with_items: "{{ docker_users }}"
+  when: docker_users is defined
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: "install Ansible docker_container dependencies"
+  pip:
+    name: docker-py
+    version: 1.9.0
+
+# Setup docker daemon config
+# Example declaration:
+#   docker_daemon_config:
+#     data-root: "/mnt/some_volume"
+- block:
+
+  # 'graph' is deprecated in future versions of docker and becomes 'data-root'
+  # this is here to support older versions
+  - name: "make sure docker graph location exists"
+    file:
+      dest: "{{ docker_daemon_config.graph }}"
+      state: directory
+    when: docker_daemon_config.graph is defined
+
+  - name: "make sure docker data-root location exists"
+    file:
+      dest: "{{ docker_daemon_config['data-root'] }}"
+      state: directory
+    when: docker_daemon_config['data-root'] is defined
+
+  - name: "setup docker daemon configuration file"
+    copy:
+      content: "{{ docker_daemon_config | to_nice_json }}"
+      dest: /etc/docker/daemon.json
+
+  when: docker_daemon_config is defined
