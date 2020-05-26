@@ -1,0 +1,7 @@
+---
+- hosts: consoles
+  become: yes
+
+  tasks:
+
+    - include: ./roles/docker/tasks/docker_setup.yml
