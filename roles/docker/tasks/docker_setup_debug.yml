@@ -1,0 +1,6 @@
+---
+- name: "list first one"
+  debug:
+    msg: "hola {{ item.uno }}" 
+  with_items: 
+    - "{{ params }}"
