@@ -5,11 +5,22 @@
   tasks:
 
 #    - include: ./roles/docker/tasks/docker_setup.yml
+
+    # - name: "install docker with specific version"
+    #   import_tasks: ./roles/docker/tasks/docker_conversions.yml
+    #   vars:
+    #     docker_params:
+    #       # docker_users: "{{ system_users | map(attribute='name') | list }}"
+    #       engine_version: "5:18.09.8~3-0~ubuntu-bionic"
+    #       client_version: "5:19.03.5~3-0~ubuntu-bionic"
+    #   tags: docker
+
+    - set_fact:
+        engine_version: "5:18.09.8~3-0~ubuntu-bionic"
+        client_version: "5:19.03.5~3-0~ubuntu-bionic"
+
+
     - name: "install docker with specific version"
       import_tasks: ./roles/docker/tasks/docker_conversions.yml
-      vars:
-        docker_params:
-          docker_users: "{{ system_users | map(attribute='name') | list }}"
-          engine_version: "5:18.09.8~3-0~ubuntu-bionic"
-          client_version: "5:19.03.5~3-0~ubuntu-bionic"
+
       tags: docker

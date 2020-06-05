@@ -1,0 +1,35 @@
+# This file is copied to some PostgreSQL servers as
+# /etc/logrotate.d/postgresql-common. It differs from the default 9.x
+# package-supplied config file in that we do daily rotates instead of
+# weekly, and we only keep 7 days' worth instead of 10 weeks' worth of
+# logs. This is acceptable because we do remote logging for all
+# PostgreSQL machines. These local logs are just there in case remote
+# logging fails.
+#
+# To see which servers get this version of the file, look for the
+# variable definition 'postgresql_common_custom_log_rotation' in some
+# 'roles/group_vars/<pg-server-role-name>/postgresql' files.
+#
+{{ postgresql_log_dir }}/*.log {
+       # rotate on size or time
+       # 1024M per day / 8 working hours =~ 150M
+       prerotate
+              LOG_FILENAME=$(hostname)-$(date --date="@$(($(date +%s) - 3600))" "+%F_%H_%M")
+              tar -C/log/postgresql/ -czf /log/upload/"$LOG_FILENAME".tgz postgresql-9.6-main-local0.log >>  /dev/null || exit 0
+       endscript
+       maxsize 150M
+       prerotate
+              LOG_FILENAME=$(hostname)-$(date --date="@$(($(date +%s) - 3600))" "+%F_%H_%M")
+              tar -C/log/postgresql/ -czf /log/s3_upload/"$LOG_FILENAME".tgz postgresql-9.6-main-local0.log >>  /dev/null || exit 0
+       endscript
+       hourly
+       # Keep 6 months worth on the system
+       # 24 hours * 7 days * 4 weeks * 6 months = 4032
+       # Why: Up to this point we have not needed to reference logs older than 6 months.
+       rotate 4032
+       copytruncate
+       delaycompress
+       compress
+       notifempty
+       missingok
+}

@@ -16,21 +16,30 @@
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
 
+- name: "list first one"
+  debug:
+    msg: "hola {{ client_version | default('*') }}" 
+
+
 - name: "install Docker packages"
   apt:
-    pkg: ["docker-ce={{ item.engine_version }}","docker-ce-cli={{ item.client_version }}", "containerd.io","docker-compose"]
+    pkg: 
+      - "docker-ce={{ engine_version | default('5:18.09.8~3-0~ubuntu-bionic') }}"
+      - "docker-ce-cli={{ client_version | default('*') }}" 
+      - "containerd.io"
+      - "docker-compose"
     state: present
     update_cache: yes
-  with_items: "{{ docker_params }}"
 
-- name: "add docker_users to docker group"
-  user:
-    name: "{{ item.docker_users }}"
-    groups: docker
-    append: yes
-  with_items: "{{ docker_params }}"
-  when: docker_users is defined
-  ignore_errors: "{{ ansible_check_mode }}"
+
+# - name: "add docker_users to docker group"
+#   user:
+#     name: "{{ item.docker_users }}"
+#     groups: docker
+#     append: yes
+#   with_items: "{{ docker_params }}"
+#   when: docker_users is defined
+#   ignore_errors: "{{ ansible_check_mode }}"
 
 # - name: "install Ansible docker_container dependencies"
 #   pip:
