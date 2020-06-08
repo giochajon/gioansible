@@ -1,0 +1,12 @@
+---
+- hosts: consoles
+  become: yes
+
+  vars:
+    postgresql_common_custom_log_rotation_needed: true
+    postgresql_log_dir: "/log/postgres"
+
+# ansible-playbook logrotate.yml --limit bionicgame
+
+  roles:
+    - role: logrotate
