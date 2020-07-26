@@ -1,0 +1,33 @@
+---
+- name: "Add an apt key by id from a keyserver"
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+
+
+- name: "add monodevelop repository prerequisite"
+  apt_repository:
+    repo: "deb http://download.mono-project.com/repo/ubuntu {{ ansible_distribution_release }} main"
+    state: present
+
+- name: "install dependency packages"
+  apt:
+    name:
+      - mono-devel
+      - mediainfo
+      - sqlite3
+      - libmono-cil-dev
+      - curl 
+      - ca-certificates-mono
+      - libcurl4-openssl-dev
+    update_cache: yes
+    state: present
+
+- name: "install deluge"
+  import_tasks: deluge.yml
+  tags: deluge
+
+- name: "install jackett"
+  import_tasks: jackett.yml
+  tags: jackett
+

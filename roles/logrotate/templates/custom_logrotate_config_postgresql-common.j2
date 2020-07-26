@@ -15,12 +15,12 @@
        # 1024M per day / 8 working hours =~ 150M
        prerotate
               LOG_FILENAME=$(hostname)-$(date --date="@$(($(date +%s) - 3600))" "+%F_%H_%M")
-              tar -C/log/postgresql/ -czf /log/upload/"$LOG_FILENAME".tgz postgresql-9.6-main-local0.log >>  /dev/null || exit 0
+              tar -C/log/postgresql/ -czf {{ custom_logrotate_target_path }}/"$LOG_FILENAME".tgz postgresql-9.6-main-local0.log >> {{ custom_logrotate_logs_file }} || exit 0
        endscript
        maxsize 150M
        prerotate
               LOG_FILENAME=$(hostname)-$(date --date="@$(($(date +%s) - 3600))" "+%F_%H_%M")
-              tar -C/log/postgresql/ -czf /log/s3_upload/"$LOG_FILENAME".tgz postgresql-9.6-main-local0.log >>  /dev/null || exit 0
+              tar -C/log/postgresql/ -czf {{ custom_logrotate_target_path }}/"$LOG_FILENAME".tgz postgresql-9.6-main-local0.log >> {{ custom_logrotate_logs_file }} || exit 0
        endscript
        hourly
        # Keep 6 months worth on the system

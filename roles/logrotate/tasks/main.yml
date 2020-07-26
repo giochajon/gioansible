@@ -1,45 +1,45 @@
 ---
-- name: "make sure target directory for the prerotate process exists"
-  file: 
-    state: directory
-    path: /log/s3_upload
-    mode: '0775'
+- block:
+  - name: "make sure target directory for the prerotate process exists"
+    file:
+      state: directory
+      path: "{{ custom_logrotate_target_path }}"
+      mode: '0775'
 
-- name: "make sure the directory for the prerotate logging status exist"
-  file: 
-    state: directory
-    path: /log/s3_upload/error_logs
-    mode: '0775'
-  
-- name: "make sure the directory for the prerotate script exist"
-  file: 
-    state: directory
-    path: /log/scripts
-    mode: '0775'
+  - name: "make sure the directory for the prerotate logging status exist"
+    file:
+      state: directory
+      path: "{{ custom_logrotate_logs_file }}"
+      mode: '0775'
 
-- name: "copy the script to upload the logs to s3"
-  copy:
-    src: upload_logs_to_s3.sh
-    dest: /log/scripts
-    mode: '0775'
+  - name: "make sure the directory for the prerotate script exist"
+    file:
+      state: directory
+      path: /log/scripts
+      mode: '0775'
 
-- name: "create cron job to execute upload every hour"
-  cron:
-    name: "upload logs to S3 five minutes past every hour"
-    minute: "5"
-    hour: "*/1"
-    job: "/log/scripts/upload_logs_to_s3.sh"
-    user: root
-    cron_file: upload_logs_to_s3
+  - name: "copy the script to upload the logs to s3"
+    template:
+      src: upload_logs_to_s3.sh.j2
+      dest: /log/scripts/upload_logs_to_s3.sh
+      mode: '0775'
 
+  - name: "create cron job to execute upload every hour"
+    cron:
+      name: "upload logs to S3 five minutes past every hour"
+      minute: "5"
+      hour: "*/1"
+      job: "/log/scripts/upload_logs_to_s3.sh"
+      user: root
+      cron_file: upload_logs_to_s3
 
-- name: "use custom postgres-common logrotate(8) file if required"
-  template:
-    src: "custom_logrotate_config_postgresql-common.j2"
-    dest: "/etc/logrotate.d/postgresql-common"
-    owner: root
-    group: root
-    mode: "u=rw,g=r,o=r"
+  - name: "use custom postgres-common logrotate(8) file if required"
+    template:
+      src: "custom_logrotate_config_postgresql-common.j2"
+      dest: "/etc/logrotate.d/postgresql-common"
+      owner: root
+      group: root
+      mode: "u=rw,g=r,o=r"
   when: postgresql_common_custom_log_rotation_needed
   tags:
     - configuration

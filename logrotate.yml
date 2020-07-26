@@ -5,6 +5,8 @@
   vars:
     postgresql_common_custom_log_rotation_needed: true
     postgresql_log_dir: "/log/postgres"
+    custom_logrotate_target_path: /log/s3_upload
+    custom_logrotate_logs_file: /log/s3_upload/error_logs
 
 # ansible-playbook logrotate.yml --limit bionicgame
 

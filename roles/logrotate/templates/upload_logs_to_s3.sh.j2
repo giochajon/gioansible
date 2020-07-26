@@ -2,9 +2,9 @@
 #
 # Move the logfiles created by custom prerotate process to S3 bucket
 
-LOG_PATH=/tmp
+LOG_PATH={{ custom_logrotate_target_path }}
 
 for file in ${LOG_PATH}/*.tar; do 
   mypath=$(echo ${file} | awk -F '[-]' '{for(i=NF-2;i<=NF;i++) printf $i"/"; }' |  awk -F '[_]' '{print $1}');
-  echo aws s3 mv /tmp/"${file}" s3://curve-log-archive/"${mypath}"/herodb/"${file}" --dryrun >> /log/s3_upload/error_logs/upload;
+  echo aws s3 mv /tmp/"${file}" s3://curve-log-archive/"${mypath}"/herodb/"${file}" >>{{ custom_logrotate_logs_file }}";
 done

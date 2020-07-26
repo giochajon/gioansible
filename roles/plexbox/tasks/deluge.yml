@@ -1,0 +1,75 @@
+---
+
+# guide from https://gist.github.com/mturley/c10b8527aa2f1a6dafb936561e11181a
+
+- name: "add deluge (bittorrent daemon) repository prerequisite"
+  apt_repository:
+    repo: "ppa:deluge-team/ppa"
+    state: present
+
+- name: "install dependency packages"
+  apt:
+    name:
+      - deluged
+      - deluge-web
+      - deluge-console
+    update_cache: yes
+    state: present
+
+- name: Ensure group deluge exists
+  group:
+    name: deluge
+    state: present
+
+- name: "Add deluge system service user with disable password"
+  user:
+    name: deluge
+    comment: 'Deluge Service'
+    shell: '/var/lib/deluge'
+    group: deluge
+    password: '!'
+    system: yes
+    state: present
+
+- name: "Add giovas user to deluge"
+  user: 
+    name: giovas
+    append: yes
+    groups: deluge
+
+- name: "Template for deluge service"
+  template:
+    src: deluged.service.j2
+    dest: /etc/systemd/system/deluged.service
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: "Template for deluge service"
+  template:
+    src: deluge-web.service.j2
+    dest: /etc/systemd/system/deluge-web.service
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: 'enable at startup and start deluged.service daemon'
+  service:
+    name: deluged.service
+    enabled: yes
+    state: restarted
+
+
+- name: 'enable at startup and start deluge-web.service'
+  service:
+    name: deluge-web.service
+    enabled: yes
+    state: restarted
+
+- name: additional reminders
+  debug:
+    msg: >
+         View Deluge Web UI at http://<yourhostname>:8112
+         The default deluge-web password is just "deluge". Change this in your first login.
+         In Deluge preferences, go to Plugins and enable the Labels plugin (required by Sonarr/Radarr)
+         

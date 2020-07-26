@@ -1,4 +1,5 @@
 
+ansible-playbook plexbox.yml --limit giotest
 
 now not necesary to specify become password
 
