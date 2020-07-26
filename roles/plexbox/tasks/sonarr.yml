@@ -1,0 +1,41 @@
+---
+- name: "Add an apt key by id from a keyserver - sonarr"
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: "0xA236C58F409091A18ACA53CBEBFF6B99D9B78493"
+
+
+- name: "add sonarr repository"
+  apt_repository:
+    repo: "deb http://apt.sonarr.tv/ master main"
+    state: present
+
+- name: "install nzbdrone dependency packages"
+  apt:
+    name:
+      - nzbdrone
+    update_cache: yes
+    state: present
+
+- name: "Template for sonarr service"
+  template:
+    src: sonarr.service.j2
+    dest: /etc/systemd/system/sonarr.service
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: 'enable at startup and start sonarr.service daemon'
+  service:
+    name: sonarr.service
+    enabled: yes
+    state: started
+
+- name: additional reminders
+  debug:
+    msg: >
+          View Sonarr at http://<yourhostname>:8989
+          NOTE: Sonarr's UI is unsecured by default, be sure to go to Settings -> General -> Security and add a password.
+          In Settings -> Download Client, add Deluge. Use default host and port, and the deluge-web password you set.
+          In Settings -> Indexers, add indexers with the Torznab -> Custom option, using the Torznab URLs and API key from Jackett.
+          Add TV Series or import existing media.

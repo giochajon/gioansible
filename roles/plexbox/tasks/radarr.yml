@@ -1,0 +1,43 @@
+---
+- name: create directory for Jacket
+  file:
+    path: /opt/Radarr
+    state: directory
+    mode: '0755'
+
+- name: Download and Unarchive radarr
+  unarchive:
+    src: https://github.com/Radarr/Radarr/releases/download/v0.2.0.1504/Radarr.develop.0.2.0.1504.linux.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: Recursively change ownership of the radarr directory
+  file:
+    path: /opt/Radarr
+    state: directory
+    recurse: yes
+    owner: giovas
+    group: giovas
+
+- name: "Template for radarr service"
+  template:
+    src: radarr.service.j2
+    dest: /etc/systemd/system/radarr.service
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: 'enable at startup and start radarr.service daemon'
+  service:
+    name: radarr.service
+    enabled: yes
+    state: started
+
+- name: additional reminders
+  debug:
+    msg: >
+          View Radarr at http://<yourhostname>:7878
+          NOTE Radarr's UI is unsecured by default, be sure to go to Settings -> General -> Security and add a password.
+          In Settings -> Download Client, add Deluge. Use default host and port, and the deluge-web password you set.
+          In Settings -> Indexers, add indexers with the Torznab -> Custom option, using the Torznab URLs and API key from Jackett.
+          Add Movies or import existing media.

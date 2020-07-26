@@ -31,3 +31,10 @@
   import_tasks: jackett.yml
   tags: jackett
 
+- name: "install radarr"
+  import_tasks: radarr.yml
+  tags: radarr
+
+- name: "install sonarr"
+  import_tasks: sonarr.yml
+  tags: sonarr
