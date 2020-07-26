@@ -38,3 +38,22 @@
 - name: "install sonarr"
   import_tasks: sonarr.yml
   tags: sonarr
+
+- name: install plex
+  block:
+   - name: Download and Unarchive Plex
+     apt:
+      deb: https://downloads.plex.tv/plex-media-server-new/1.19.5.3112-b23ab3896/debian/plexmediaserver_1.19.5.3112-b23ab3896_amd64.deb
+
+   - name: additional reminders
+     debug:
+       msg: >
+              View Plex at http://<yourhostname>:32400/web/index.html (The Plex service auto-starts by default)
+              Plex is unsecured by default, but should prompt you to "claim" your server with a Plex account on first login.
+              Set up Plex to watch directories where media is managed by Sonarr and Radarr.
+              For first-time Plex setup, you must access the Plex UI from the same subnet as the server. If it is a remote server
+              and that's not possible, you'll need to do the first-time setup through an SSH tunnel
+              From your local machine
+              ssh ip.address.of.server -L 8888:localhost:32400
+  tags: plex
+
