@@ -57,3 +57,6 @@
               ssh ip.address.of.server -L 8888:localhost:32400
   tags: plex
 
+- name: "install tautulli"
+  import_tasks: tautulli.yml
+  tags: tautulli

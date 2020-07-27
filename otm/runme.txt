@@ -1,5 +1,5 @@
 
-ansible-playbook plexbox.yml --limit giotest
+ansible-playbook plexbox.yml --limit clonstairs
 
 now not necesary to specify become password
 

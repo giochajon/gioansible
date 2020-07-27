@@ -1,0 +1,70 @@
+---
+- name: "install tautulli dependency packages"
+  apt:
+    name:
+      - git-core 
+      - python3.7
+    update_cache: yes
+    state: present
+
+- name: create directory for tautully
+  file:
+    path: /opt/Tautulli
+    state: directory
+    mode: '0755'
+
+- git:
+    repo: 'https://github.com/Tautulli/Tautulli.git'
+    dest: /opt/Tautulli
+
+- name: Ensure tautulli  exists
+  group:
+    name: tautulli
+    state: present
+
+- name: Recursively change ownership of the tautulli directory
+  file:
+    path: /opt/Tautulli
+    state: directory
+    recurse: yes
+    owner: tautulli
+    group: tautulli
+
+- name: "Add tautulli system service user with disable password"
+  user:
+    name: tautulli
+    comment: 'Tautulli Service'
+    shell: '/var/lib/tautulli'
+    group: tautulli
+    password: '!'
+    system: yes
+    state: present
+
+
+
+
+- name: "Add giovas user to tautilli"
+  user: 
+    name: giovas
+    append: yes
+    groups: tautulli
+
+- name: "Template for tautully service"
+  copy:
+    src: /opt/Tautulli/init-scripts/init.systemd
+    dest: /lib/systemd/system/tautulli.service
+    remote_src: yes
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: 'enable at startup and start tautulli.service daemon'
+  service:
+    name: tautulli.service
+    enabled: yes
+    state: restarted
+
+- name: additional reminders
+  debug:
+    msg: >
+          Tautulli will be loaded in your browser or listening on http://localhost:8181
