@@ -1,0 +1,25 @@
+---
+# based on https://linuxize.com/post/how-to-install-asterisk-on-ubuntu-18-04/
+- name: "install dependency packages"
+  apt:
+    name:
+      - wget 
+      - build-essential 
+      - subversion
+    update_cache: yes
+    state: present
+
+- name: 'Download asterisk 17 and extract it'
+  unarchive:
+    src: http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-17-current.tar.gz
+    dest: /usr/src/
+    remote_src: yes
+
+- name: 'run mp3 and dependency scripts from contrib'
+  command: "{{ item }}"
+  with_items:
+    -   /usr/src/asterisk-17.6.0/contrib/scripts/get_mp3_source.sh
+    -   /usr/src/asterisk-17.6.0/contrib/scripts/install_prereq install
+    -   /usr/src/asterisk-17.6.0/configure
+    -   /usr/src/asterisk-17.6.0/make menuselect
+  become: yes
